@@ -20,7 +20,7 @@ function AppRouter() {
             element={<Home />}
           />
           <Route
-            path='shop'
+            path='shop/*'
             element={<Shop />}
           />
           <Route

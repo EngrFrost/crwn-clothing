@@ -1,6 +1,11 @@
 import { createContext, useState, useEffect } from 'react';
-import { createUserDocumentFromAuth, onAuthStateChangedListiner } from '../../utils/firebase.utils';
-import productList from '../../shop-data.json';
+import {
+  addCollectionAndDocuments,
+  createUserDocumentFromAuth,
+  getCategiruesAndDocuments,
+  onAuthStateChangedListiner,
+} from '../../utils/firebase.utils';
+import productList from '../../shop-data.js';
 
 export const userContext = createContext();
 export const allProvider = userContext.Provider;
@@ -14,6 +19,7 @@ const UserProvider = ({ children }) => {
     cartItems: [],
     cartCount: 0,
     cartTotal: 0,
+    categoriesMap: [],
   });
 
   useEffect(() => {
@@ -22,7 +28,6 @@ const UserProvider = ({ children }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChangedListiner((user) => {
-      console.log(user);
       if (user) {
         createUserDocumentFromAuth(user);
       }
@@ -33,18 +38,31 @@ const UserProvider = ({ children }) => {
 
     return unsubscribe;
   }, []);
+  // first try to store data
+  // useEffect(() => {
+  //   addCollectionAndDocuments('categories', productList);
+  // }, []);
+  useEffect(() => {
+    const getCategoriesMap = async () => {
+      const categoryMap = await getCategiruesAndDocuments();
 
+      setData((prev) => {
+        return { ...prev, categoriesMap: categoryMap };
+      });
+    };
+    getCategoriesMap();
+  }, []);
   useEffect(() => {
     setData((prev) => {
       const newcartCount = data.cartItems.reduce((total, cartItem) => total + cartItem.quantity, 0);
-      console.log(newcartCount);
+
       return { ...prev, cartCount: newcartCount };
     });
   }, [data.cartItems]);
 
   useEffect(() => {
     const newCartTotal = data.cartItems.reduce((total, cartItem) => total + cartItem.quantity * cartItem.price, 0);
-    console.log(newCartTotal);
+
     setData((prev) => {
       return { ...prev, cartTotal: newCartTotal };
     });
@@ -53,7 +71,6 @@ const UserProvider = ({ children }) => {
   const addCartItem = (cartItems, prodID) => {
     const existingCartItem = cartItems.find((cartItem) => cartItem.id === prodID.id);
     if (existingCartItem) {
-      console.log('exist');
       return cartItems.map((cartItem) =>
         cartItem.id === prodID.id ? { ...cartItem, quantity: cartItem.quantity + 1 } : cartItem,
       );
@@ -62,7 +79,6 @@ const UserProvider = ({ children }) => {
   };
 
   const AddItemtoCart = (producttoAdd) => {
-    console.log('test');
     setData((prev) => {
       return { ...prev, cartItems: addCartItem(data.cartItems, producttoAdd) };
     });
