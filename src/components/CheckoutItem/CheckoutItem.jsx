@@ -1,16 +1,19 @@
 import React, { useContext } from 'react';
 import { userContext } from '../userContext/userContext';
 import './CheckoutItem.scss';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { AddItemtoCart, removeItemToCart } from '../../store/cart/cartAction';
+import { selectCartItems } from '../../store/cart/cartSelector';
 function CheckoutItem({ cartItem }) {
   const { name, imageUrl, price, quantity } = cartItem;
-  const { removeItemToCart, AddItemtoCart, clearItemFromCart } = useContext(userContext);
+  const cartItems = useSelector(selectCartItems);
+  // const { removeItemToCart, AddItemtoCart, clearItemFromCart } = useContext(userContext);
+  const dispatch = useDispatch();
+  const clearItemFromCartHandler = () => dispatch(clearItemFromCartHandler(cartItems, cartItem));
 
-  const clearItemFromCartHandler = () => clearItemFromCart(cartItem);
+  const removeITemToCartHandler = () => dispatch(removeItemToCart(cartItems, cartItem));
 
-  const removeITemToCartHandler = () => removeItemToCart(cartItem);
-
-  const addItemHandler = () => AddItemtoCart(cartItem);
+  const addItemHandler = () => dispatch(AddItemtoCart(cartItems, cartItem));
   return (
     <div className='checkout-item-container'>
       <div className='image-container'>

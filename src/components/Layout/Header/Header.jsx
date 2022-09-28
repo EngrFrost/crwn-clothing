@@ -1,26 +1,30 @@
 import React, { Fragment } from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import './Header.scss';
+import { useSelector, useDispatch } from 'react-redux';
 import crown from '../../../assets/crown.svg';
 import { useContext } from 'react';
 import { userContext } from '../../userContext/userContext';
 import { signOutUser } from '../../../utils/firebase.utils';
 import CartIcon from '../../CartIcon/CartIcon';
 import Cartdropdown from '../../CartIcon/Cartdropdown';
+import { selectCurrentUser } from '../../../store/user/userSelector';
+import { selectIsCartOpen } from '../../../store/cart/cartSelector';
+import { setIsCartOpen } from '../../../store/cart/cartAction';
+import { setCurrentUser } from '../../../store/user/userAction';
 function Header() {
-  const { data, setData } = useContext(userContext);
-
+  const currentUser = useSelector(selectCurrentUser);
+  const isCartOpen = useSelector(selectIsCartOpen);
+  const dispatch = useDispatch();
   const signOutHandler = async () => {
     await signOutUser();
-    setData((prev) => {
-      return { ...prev, currentUser: null };
-    });
+
+    dispatch(setCurrentUser(null));
   };
+ 
   const toggleHandler = () => {
-    console.log('check')
-    setData((prev) => {
-      return { ...prev, isCartOpen: !prev.isCartOpen };
-    });
+    dispatch(setIsCartOpen(!isCartOpen));
+    // console.log(isCartOpen);
   };
   return (
     <Fragment>
@@ -43,7 +47,7 @@ function Header() {
           >
             Shop
           </Link>
-          {data.currentUser ? (
+          {currentUser ? (
             <span
               className='nav-link'
               onClick={signOutHandler}
@@ -61,7 +65,7 @@ function Header() {
           )}
           <CartIcon toggleHandler={toggleHandler} />
         </div>
-        {data.isCartOpen && <Cartdropdown />}
+        {isCartOpen && <Cartdropdown />}
       </div>
       <Outlet />
     </Fragment>

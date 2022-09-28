@@ -4,12 +4,16 @@ import './index.css';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 import { ReactNotifications } from 'react-notifications-component';
+import { Provider } from 'react-redux';
+import { store } from './store/store';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <ReactNotifications />
-      <App />
-    </BrowserRouter>
+    <Provider store={store}>
+      <BrowserRouter>
+        <ReactNotifications />
+        <App />
+      </BrowserRouter>
+    </Provider>
   </React.StrictMode>,
 );
